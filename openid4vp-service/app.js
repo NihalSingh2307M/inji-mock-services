@@ -11,7 +11,7 @@ const {redirectAuthorizationRequest, preRegisteredAuthorizationRequest, didAutho
 } = require("./inputData");
 const PORT = 3000;
 
-
+let responseReceived = false;
 
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 app.set('view engine', 'ejs');
@@ -34,8 +34,7 @@ app.get('/verifier/generate-auth-request-by-value-redirect-qr', async (req, res)
   try {
      const qrData = createUrlWithParams(redirectAuthorizationRequest);
      const qrCodeData = await QRCode.toDataURL(qrData);
-
-    res.render('index', { title: 'Home', qrCodeData });
+    res.render('index', { title: 'Home', qrCodeData, qrData });
   } catch (error) {
     console.error('Error generating QR code:', error);
     res.status(500).send('Internal Server Error');
@@ -47,7 +46,7 @@ app.get('/verifier/generate-auth-request-by-value-pre-registered-qr', async (req
      const qrData = createUrlWithParams(preRegisteredAuthorizationRequest);
      const qrCodeData = await QRCode.toDataURL(qrData);
 
-     res.render('index', { title: 'Home', qrCodeData });
+     res.render('index', { title: 'Home', qrCodeData, qrData });
   } catch (error) {
     console.error('Error generating QR code:', error);
     res.status(500).send('Internal Server Error');
@@ -59,7 +58,7 @@ app.get('/verifier/generate-auth-request-by-reference-qr', async (req, res) => {
         const qrData = createUrlWithParams(authorizationRequestParams);
         const qrCodeData = await QRCode.toDataURL(qrData);
 
-        res.render('index', {title: 'Home', qrCodeData});
+        res.render('index', {title: 'Home', qrCodeData, qrData});
     } catch (error) {
         console.error('Error generating QR code:', error);
         res.status(500).send('Internal Server Error');
@@ -100,11 +99,16 @@ app.post('/verifier/vp-response', (req, res) => {
     console.log('data:', JSON.stringify(req.body));
   // console.log('vp_token:', req.body.vp_token);
   // console.log('presentation_submission:', req.body.presentation_submission);
-
+    responseReceived = true;
   /*Change this response for testing other flows*/
   res.status(200).json({
     message: `Verifiable presentation is received successfully.`,
   });
+});
+
+app.get('/verifier/check-response', (req, res) => {
+  res.json({ responseReceived });
+  responseReceived = false;
 });
 
 app.listen(PORT, () => {
