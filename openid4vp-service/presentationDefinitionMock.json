@@ -32,20 +32,20 @@
       }
     },
     {
-      "id": "docType",
+      "id": "org.iso.18013.5.1.mDL",
       "format": {
         "mso_mdoc": {
           "alg": ["ES256"]
-        },
-        "constraints": {
-          "fields" : [
-            {
-              "path": [
-                "$['docType']['claim']"
-              ]
-            }
-          ]
         }
+      },
+      "constraints": {
+        "fields" : [
+          {
+            "path": [
+              "$['org.iso.18013.5.1']['document_number']"
+            ]
+          }
+        ]
       }
     }
   ]
