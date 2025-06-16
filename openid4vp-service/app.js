@@ -4,6 +4,8 @@ const QRCode = require('qrcode');
 const presentationDefinition = require('./presentationDefinitionMock.json');
 const bodyParser = require('body-parser');
 const {createJWT} = require("./jwt");
+const cors = require('cors');
+
 const app = express();
 const {requestUri, didDocumentUrl} = require("./constants");
 const {
@@ -19,6 +21,7 @@ const {
 const PORT = 3000;
 
 let responseReceived = false;
+let latestVpResult = null;
 
 app.use(bodyParser.urlencoded({limit: '20mb', extended: true}));
 app.set('view engine', 'ejs');
@@ -26,6 +29,8 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(cors());
 
 function createUrlWithParams(params) {
     const baseUrl = "openid4vp://authorize";
@@ -41,7 +46,8 @@ app.get('/verifier/generate-auth-request-by-value-redirect-qr', async (req, res)
     try {
         const qrData = createUrlWithParams(redirectAuthorizationRequest);
         const qrCodeData = await QRCode.toDataURL(qrData);
-        res.render('index', {title: 'Home', qrCodeData, qrData});
+        const inputData = redirectAuthorizationRequest
+        res.json({ qrCodeData, qrData, inputData });
     } catch (error) {
         console.error('Error generating QR code:', error);
         res.status(500).send('Internal Server Error');
@@ -52,8 +58,8 @@ app.get('/verifier/generate-auth-request-by-value-pre-registered-qr', async (req
     try {
         const qrData = createUrlWithParams(preRegisteredAuthorizationRequest);
         const qrCodeData = await QRCode.toDataURL(qrData);
-
-        res.render('index', {title: 'Home', qrCodeData, qrData});
+        const inputData = preRegisteredAuthorizationRequest
+        res.json({ qrCodeData, qrData, inputData });
     } catch (error) {
         console.error('Error generating QR code:', error);
         res.status(500).send('Internal Server Error');
@@ -64,8 +70,8 @@ app.get('/verifier/generate-auth-request-by-reference-qr', async (req, res) => {
     try {
         const qrData = createUrlWithParams(authorizationRequestParams);
         const qrCodeData = await QRCode.toDataURL(qrData);
-
-        res.render('index', {title: 'Home', qrCodeData, qrData});
+        const inputData = authorizationRequestParams
+        res.json({ qrCodeData, qrData, inputData });
     } catch (error) {
         console.error('Error generating QR code:', error);
         res.status(500).send('Internal Server Error');
@@ -104,14 +110,26 @@ app.get('/verifier/presentation_definition_uri', async (req, res) => {
 app.post('/verifier/vp-response', (req, res) => {
     console.log("received vp response on ", Date.now());
     console.log('data:', JSON.stringify(req.body));
-    // console.log('vp_token:', req.body.vp_token);
-    // console.log('presentation_submission:', req.body.presentation_submission);
+
     responseReceived = true;
-    /*Change this response for testing other flows*/
+    latestVpResult = req.body;
+
     res.status(200).json({
-        message: `Verifiable presentation is received successfully.`,
+        message: `Verifiable presentation received successfully.`,
     });
 });
+
+
+app.get('/verifier/vp-result', (req, res) => {
+    if (responseReceived && latestVpResult) {
+        res.json(latestVpResult);
+        responseReceived = false;
+        latestVpResult = null;
+    } else {
+        res.json(false);
+    }
+});
+
 
 app.get('/verifier/check-response', (req, res) => {
     res.json({responseReceived});
