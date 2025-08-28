@@ -14,8 +14,10 @@ const QrScreen = () => {
     const [scanResult, setScanResult] = useState(null);
     const [copied, setCopied] = useState(false);
     const [copiedResult, setCopiedResult] = useState(false);
+    const [copiedAuthRequest, setCopiedAuthRequest] = useState(false);
     const [showInputData, setShowInputData] = useState(false);
     const [actualAuthorizationRequestObject, setActualAuthorizationRequestObject] = useState(null);
+
 
     useEffect(() => {
         const fetchQr = async () => {
@@ -63,37 +65,53 @@ const QrScreen = () => {
     const handleCopy = (textSetter, setToast) => {
         navigator.clipboard.writeText(textSetter);
         setToast(true);
-        setTimeout(() => setToast(false), 2000);
+        setTimeout(() => setToast(false), 1500);
     };
 
     const renderActualAuthRequestObject = () => {
         return <>
             {actualAuthorizationRequestObject && (
-                <div style={{flex: 1}}>
-                    <h2>Actual Authorization Request Object</h2>
-                    <div
-                        style={{
-                            background: '#f4f4f4',
-                            padding: '16px',
-                            borderRadius: '6px',
-                            fontSize: '14px',
-                            fontFamily: 'monospace',
-                            whiteSpace: 'pre-wrap',
-                            wordBreak: 'break-word',
-                            maxWidth: '100%',
-                            overflowX: 'auto'
-                        }}
-                    >
-                            <pre style={{margin: 0}}>
-                              {JSON.stringify(actualAuthorizationRequestObject, null, 2)}
-                            </pre>
+                <div className="auth-request-container">
+                    <div style={{
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        marginBottom: '8px'
+                    }}>
+                        <h2 style={{margin: 0}}>Actual Authorization Request Object</h2>
+                        <button
+                            onClick={() =>
+                                handleCopy(
+                                    JSON.stringify(actualAuthorizationRequestObject, null, 2),
+                                    setCopiedAuthRequest
+                                )
+                            }
+                            style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                borderRadius: '4px',
+                                border: '1px solid #ccc',
+                                backgroundColor: copiedAuthRequest ? '#4caf50' : '#eee',
+                                color: copiedAuthRequest ? 'white' : 'black',
+                                cursor: 'pointer',
+                                minWidth: '60px',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            {copiedAuthRequest ? 'Copied!' : 'Copy'}
+                        </button>
+                    </div>
+                    <div className="scrollable-json-container">
+                        <pre style={{margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
+                            {JSON.stringify(actualAuthorizationRequestObject, null, 2)}
+                        </pre>
                     </div>
                 </div>
             )}
         </>;
     }
     return (
-        <div style={{padding: '40px'}}>
+        <div className="responsive-container">
             <button
                 onClick={() => navigate('/')}
                 style={{
@@ -108,10 +126,11 @@ const QrScreen = () => {
             >
                 ← Back
             </button>
-            <h1 style={{marginBottom: '20px'}}>Scan screen</h1>
-            <div style={{display: 'flex'}}>
+            <h1 className="page-title">Scan screen</h1>
+            <div className="two-column-layout">
 
-                <div style={{flex: 1, marginRight: '40px', maxWidth: '50%'}}>
+                <div className="qr-code-section">
+
 
                     {qrCodeData && qrData ? (
                         <div>
@@ -119,13 +138,7 @@ const QrScreen = () => {
                                 <img
                                     src={qrCodeData}
                                     alt="QR Code"
-                                    style={{
-                                        width: '400px',
-                                        height: '400px',
-                                        marginBottom: '10px',
-                                        cursor: 'pointer',
-                                        display: 'block',
-                                    }}
+                                    className="qr-code-image"
                                 />
                             </a>
 
@@ -147,6 +160,8 @@ const QrScreen = () => {
                                 ⬇ Download QR
                             </a>
                         </div>
+
+
                     ) : (
                         <p>Loading...</p>
                     )}
@@ -168,30 +183,19 @@ const QrScreen = () => {
                     </button>
 
                     {showInputData && (
-                        <div
-                            style={{
-                                background: '#f4f4f4',
-                                padding: '16px',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontFamily: 'monospace',
-                                whiteSpace: 'pre-wrap',
-                                wordBreak: 'break-word',
-                                marginTop: '10px',
-                                maxWidth: '600px',
-                                overflowX: 'auto'
-                            }}
-                        >
-                            <pre style={{margin: 0}}>
-                              {JSON.stringify(inputData, null, 2)}
-                            </pre>
+                        <div className="description-container">
+                            <div className="json-display-block">
+                                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                  {JSON.stringify(inputData, null, 2)}
+                                </pre>
+                            </div>
                         </div>
                     )}
 
                     {renderActualAuthRequestObject()}
 
                     {qrData && (
-                        <div style={{marginTop: '16px'}}>
+                        <div className="payload-container">
                             <div style={{
                                 display: 'flex', 
                                 justifyContent: 'space-between', 
@@ -199,55 +203,29 @@ const QrScreen = () => {
                                 marginBottom: '8px'
                             }}>
                                 <h4 style={{margin: 0}}>Payload</h4>
-                                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                                    {copied && (
-                                        <div
-                                            style={{
-                                                padding: '6px 12px',
-                                                backgroundColor: '#4caf50',
-                                                color: 'white',
-                                                borderRadius: '4px',
-                                                fontSize: '12px',
-                                                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                                            }}
-                                        >
-                                            Copied!
-                                        </div>
-                                    )}
-                                    <button
-                                        onClick={() =>
-                                            handleCopy(
-                                                typeof qrData === 'string' ? qrData : JSON.stringify(qrData, null, 2),
-                                                setCopied
-                                            )
-                                        }
-                                        style={{
-                                            padding: '6px 12px',
-                                            fontSize: '12px',
-                                            borderRadius: '4px',
-                                            border: '1px solid #ccc',
-                                            backgroundColor: '#eee',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Copy
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={() =>
+                                        handleCopy(
+                                            typeof qrData === 'string' ? qrData : JSON.stringify(qrData, null, 2),
+                                            setCopied
+                                        )
+                                    }
+                                    style={{
+                                        padding: '6px 12px',
+                                        fontSize: '12px',
+                                        borderRadius: '4px',
+                                        border: '1px solid #ccc',
+                                        backgroundColor: copied ? '#4caf50' : '#eee',
+                                        color: copied ? 'white' : 'black',
+                                        cursor: 'pointer',
+                                        minWidth: '60px',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    {copied ? 'Copied!' : 'Copy'}
+                                </button>
                             </div>
-                            <div
-                                style={{
-                                    background: '#f4f4f4',
-                                    padding: '16px',
-                                    borderRadius: '6px',
-                                    fontSize: '14px',
-                                    fontFamily: 'monospace',
-                                    maxHeight: '400px',
-                                    overflow: 'auto',
-                                    maxWidth: '100%',
-                                    whiteSpace: 'pre-wrap',
-                                    wordBreak: 'break-word',
-                                }}
-                            >
+                            <div className="json-display-block">
                                 <pre style={{margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
                                     {typeof qrData === 'string' ? qrData : JSON.stringify(qrData, null, 2)}
                                 </pre>
@@ -257,49 +235,36 @@ const QrScreen = () => {
                 </div>
 
 
-                <div style={{flex: 1, marginLeft: '40px'}}>
+                <div className="scan-result-section">
                     <div style={{
                         display: 'flex', 
                         justifyContent: 'space-between', 
                         alignItems: 'center',
                         marginBottom: '8px'
                     }}>
-                        <h2 style={{margin: 0}}>Scan Result</h2>
+                        <h2 className="section-title" style={{margin: 0}}>Scan Result</h2>
                         {scanResult && (
-                            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                                {copiedResult && (
-                                    <div
-                                        style={{
-                                            padding: '6px 12px',
-                                            backgroundColor: '#4caf50',
-                                            color: 'white',
-                                            borderRadius: '4px',
-                                            fontSize: '12px',
-                                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                                        }}
-                                    >
-                                        Copied!
-                                    </div>
-                                )}
-                                <button
-                                    onClick={() =>
-                                        handleCopy(
-                                            JSON.stringify(prettyScanResult(scanResult), null, 2),
-                                            setCopiedResult
-                                        )
-                                    }
-                                    style={{
-                                        padding: '6px 12px',
-                                        fontSize: '12px',
-                                        borderRadius: '4px',
-                                        border: '1px solid #ccc',
-                                        backgroundColor: '#eee',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    Copy
-                                </button>
-                            </div>
+                            <button
+                                onClick={() =>
+                                    handleCopy(
+                                        JSON.stringify(prettyScanResult(scanResult), null, 2),
+                                        setCopiedResult
+                                    )
+                                }
+                                style={{
+                                    padding: '6px 12px',
+                                    fontSize: '12px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ccc',
+                                    backgroundColor: copiedResult ? '#4caf50' : '#eee',
+                                    color: copiedResult ? 'white' : 'black',
+                                    cursor: 'pointer',
+                                    minWidth: '60px',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                {copiedResult ? 'Copied!' : 'Copy'}
+                            </button>
                         )}
                     </div>
 
@@ -314,7 +279,7 @@ const QrScreen = () => {
                                 whiteSpace: 'pre-wrap',
                                 wordBreak: 'break-word',
                                 width: '100%',
-                                overflow: 'hidden',
+                                boxSizing: 'border-box'
                             }}
                         >
                             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -329,12 +294,16 @@ const QrScreen = () => {
                                 borderRadius: '6px',
                                 fontSize: '14px',
                                 fontFamily: 'monospace',
+                                textAlign: 'center',
+                                width: '100%',
+                                boxSizing: 'border-box'
                             }}
                         >
                             Waiting for scan result...
                         </div>
                     )}
                 </div>
+
             </div>
         </div>
     );
