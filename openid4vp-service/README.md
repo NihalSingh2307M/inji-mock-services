@@ -55,12 +55,48 @@ npm start # asks base url (localtunnel url or any remote url) and starts the ser
 | Authorization Response type                               | `vp_token`                                                                                                                                                                                                                                                                                                                                                         |
 | Supported Credential formats                              | `ldp_vc`, `mso_mdoc`                                                                                                                                                                                                                                                                                                                                               |
 
+### OpenID4VP Mock Service End-points
 
-### This exposes five end-points:
+1. Generate QR code with Verifier's Authorization Request
 
-- Refer to app.js file for the below end-points.
+- This end-point can be used to generate the QR code with the Verifier's Authorization Request to fetch the Verifiable Credentials from the Wallet.
+- Endpoint
+```html
+/verifier/<client_id_scheme>/<response_mode>?draft=<draft_version>
+```
+- The placeholder values in the end-point should be replaced with the below values:
+    - client_id_scheme = pre-registered, redirect_uri, did
+    - response_mode = by_value, by_reference
+    - draft_version = draft-21, draft-23 (default draft-23)
+- Error scenarios:
+    
+| Scenario                                                                   | status code | Message                                                              |
+|----------------------------------------------------------------------------|-------------|----------------------------------------------------------------------|
+| 1. Provided client_id_scheme / response_mode / draft version not supported | 400         | Bad Request: Provided combination is not supported                   |
+| 2. Provided request_mode is not supported                                  | 400         | Bad Request: <client_id_scheme> does not support <request_mode> mode |
+| 3. Other general errors                                                    | 500         | Internal Server Error                                                |
 
-### 1. Create QR code for Verifier's Authorization Request By Value
+
+2. Get Authorization Request Object (for request_uri method)
+
+- This is the request_uri endpoint which is used to generate and send the Authorisation Request object as a JWT
+- Endpoint
+```html
+/verifier/get-auth-request-obj/<client_id_scheme>?draft=<draft_version>
+```
+- The placeholder values in the end-point should be replaced with the below values:
+    - client_id_scheme = pre-registered, redirect_uri, did
+    - draft_version = draft-21, draft-23 (default draft-23)
+- Error scenarios:
+
+| Scenario                                                       | status code | Message                                                              |
+|----------------------------------------------------------------|-------------|----------------------------------------------------------------------|
+| 1. Provided client_id_scheme / draft version not supported     | 400         | Bad Request: Provided combination is not supported                   |
+| 2. By reference mode is not supported for the client id scheme | 400         | Bad Request: <client_id_scheme> does not support <request_mode> mode |
+| 3. Other general errors                                        | 500         | Internal Server Error                                                |
+
+
+### 3. (Deprecated) Create QR code for Verifier's Authorization Request By Value
 
 ```
 /verifier/generate-auth-request-by-value-<client_id_scheme>-qr
@@ -119,7 +155,7 @@ or
     8%22%5D%7D%7D%7D"
 ```
 
-### 2. Create QR code for Verifier's Authorization Request By Reference
+### 4. (Deprecated) Create QR code for Verifier's Authorization Request By Reference
 
 ```
 /verifier/generate-auth-request-by-reference-qr
@@ -137,7 +173,7 @@ or
 
 ```
 
-#### 3. Get Authorization Request Object
+#### 5. (Deprecated) Get Authorization Request Object
 
 ```
 /verifier/get-auth-request-obj:
@@ -145,7 +181,7 @@ or
 - This is the request_uri endpoint which is used to generate and send the Authorisation Request object either as a JWT or base64 encoded string.
 
 
-### 4. Get Presentation Definition Object
+### 6. Get Presentation Definition Object
 
 ```
 /verifier/presentation_definition_uri
@@ -153,7 +189,7 @@ or
 - This end-point can be passed as part of the Verifier's Authorization Request QR code which gives the actual presentation_definition object when called.
 - Please refer to the above example to understand how to send presentation_definition_uri as part of the Authorization Request.
 
-### 5. Submission of Authorization Response
+### 7. Submission of Authorization Response
 
 ```
 /verifier/vp-response:
