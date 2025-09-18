@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {CLIENT_ID_SCHEMES} from "../constants/constants";
+import {CLIENT_ID_SCHEMES, DRAFT_VERSIONS} from "../constants/constants";
 import Button from "../components/common/Button";
 import {backgroundStyle, Palette, font} from "../styles/palette";
 
@@ -65,7 +65,6 @@ const getResponsiveStyles = () => {
 const Home = () => {
     const navigate = useNavigate();
     const styles = getResponsiveStyles();
-
     useEffect(() => {
         document.title = 'Home';
     }, []);
@@ -76,8 +75,15 @@ const Home = () => {
         {name: CLIENT_ID_SCHEMES.DID}
     ];
 
-    const handleClick = (endpointObj) => {
-        navigate('/qr', {state: {name: endpointObj.name}});
+    const handleClientIdSchemeClick = (endpointObj) => {
+        // Default  Draft 23
+        navigate('/qr', {
+            state: {
+                name: endpointObj.name,
+                draftVersion: DRAFT_VERSIONS.DRAFT_23,
+                title: `${endpointObj.name} - ${DRAFT_VERSIONS.DRAFT_23}`
+            }
+        });
     };
 
     return (
@@ -89,10 +95,9 @@ const Home = () => {
                     This is a mock verifier service for demonstration purposes.
                 </p>
                 <p style={{marginBottom: '15px'}}>
-                                        <span
-                                            style={{color: Palette.primaryText, fontWeight: 'bold', fontSize: 'large'}}>
-                                            Supported Device flows:
-                                        </span>
+                    <span style={{color: Palette.primaryText, fontWeight: 'bold', fontSize: 'large'}}>
+                        Supported Device flows:
+                    </span>
                     <ol style={styles.ol}>
                         <li style={{marginBottom: '8px'}}>
                             <span style={{color: Palette.primaryText}}>Same device flow</span> - Click the QR code to
@@ -110,12 +115,12 @@ const Home = () => {
                 <div style={styles.buttonGrid}>
                     {endpoints.map(e => (
                         <div key={e.name} style={{ display: 'flex', alignItems: 'baseline'}}>
-                                                <span role="img" aria-label="emoji" style={styles.emoji}>
-                                                    {e.name === CLIENT_ID_SCHEMES.PRE_REGISTERED ? '🔐' :
-                                                        e.name === CLIENT_ID_SCHEMES.REDIRECT_URI ? '🔄' : '🆔'}
-                                                </span>
+                            <span role="img" aria-label="emoji" style={styles.emoji}>
+                                {e.name === CLIENT_ID_SCHEMES.PRE_REGISTERED ? '🔐' :
+                                    e.name === CLIENT_ID_SCHEMES.REDIRECT_URI ? '🔄' : '🆔'}
+                            </span>
                             <Button
-                                onClick={() => handleClick(e)}
+                                onClick={() => handleClientIdSchemeClick(e)}
                                 variant={"secondary"}
                                 style={styles.button}
                             >
