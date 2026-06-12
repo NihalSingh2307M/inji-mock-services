@@ -16,13 +16,13 @@ const jwkSet = {
     ]
 }
 //update this baseurl with the localtunnel url
-const baseUrl = "https://129e4f0672b6.ngrok-free.app"
+const baseUrl = "http://localhost:3000"
 const requestUri = `${baseUrl}/verifier/get-auth-request-obj`
 const responseUri = `${baseUrl}/verifier/vp-response`
 const presentationDefinitionUri  = `${baseUrl}/verifier/presentation_definition_uri`
 const didDocumentUrl = "did:web:inji.github.io:inji-mock-services:openid4vp-service:docs"
 const clientId  = "http://mock-verifier"
-const nonce = crypto.randomBytes(16).toString('base64');
+const nonce = crypto.randomBytes(16).toString('base64url');
 const state = crypto.randomBytes(16).toString('base64');
 
 const ContentTypes = {
@@ -40,13 +40,19 @@ const CLIENT_ID_SCHEMES = {
 // enum for draft versions
 const DRAFT_VERSIONS = {
     DRAFT_21: "draft-21",
-    DRAFT_23: "draft-23"
+    DRAFT_23: "draft-23",
+    V_1_0: "version-1.0"
 }
 
 // enum for request modes
 const REQUEST_MODES = {
     BY_VALUE: "by_value",
     BY_REFERENCE: "by_reference"
+}
+
+const ResponseModes = {
+    DIRECT_POST: "direct_post",
+    DIRECT_POST_JWT: "direct_post.jwt"
 }
 
 // enum for supporting signed request or not
@@ -71,6 +77,7 @@ module.exports = {
     jwkSet,
 
     REQUEST_MODES,
+    ResponseModes,
     CLIENT_ID_SCHEMES,
     DRAFT_VERSIONS,
     REQUEST_SIGNING_SUPPORT_MODES

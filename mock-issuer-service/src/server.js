@@ -107,3 +107,7 @@ const options = {
 https.createServer(options, app).listen(4000, () => {
   console.log("Mock Issuer running at https://mock-issuer.local:4000");
 });
+
+// app.listen(4000, () => {
+//   console.log(`Server is running on http://localhost:4000`);
+// });

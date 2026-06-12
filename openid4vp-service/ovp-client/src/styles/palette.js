@@ -35,6 +35,21 @@ export const Palette = {
 
     textDark: "#000000",
     textLight: "#FFFFFF",
+
+    // **Borders & Muted Surfaces**
+    border: '#E5E5EA',
+    borderLight: '#F0F0F0',
+    mutedSurface: '#F5F5F5',
+};
+
+export const spacing = {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    xxl: 24,
+    xxxl: 32,
 };
 
 export const backgroundStyle = {
@@ -48,29 +63,73 @@ export const font = {
     code: "monospace, 'Courier New', Courier",
 };
 
+export const cardStyles = {
+    base: {
+        background: Palette.surface,
+        borderRadius: '12px',
+        border: `1px solid ${Palette.border}`,
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        overflow: 'hidden',
+    },
+    padding: {
+        padding: `${spacing.xl}px`,
+    },
+    sectionTitle: {
+        fontSize: '12px',
+        fontWeight: 600,
+        color: Palette.tertiaryText,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        margin: 0,
+    },
+    accordionHeader: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: `${spacing.md + 2}px ${spacing.xl}px`,
+        fontSize: '14px',
+        fontWeight: 500,
+        color: Palette.headingText,
+        cursor: 'pointer',
+        background: 'transparent',
+        border: 'none',
+        fontFamily: font.primary,
+        textAlign: 'left',
+    },
+};
+
 export const buttonStyles = {
     base: {
         fontFamily: font.primary,
         fontWeight: 600,
         fontSize: "15px",
-        padding: "10px 18px",
         borderRadius: "12px",
         border: "none",
         cursor: "pointer",
         transition: "all 0.3s ease",
-        boxShadow: `0 4px 10px ${Palette.primaryShadow}`,
     },
 
     primary: {
         background: backgroundStyle.primaryGradient,
+        boxShadow: `0 4px 10px ${Palette.primaryShadow}`,
         color: Palette.primaryText,
+        padding: "10px 18px",
     },
 
     secondary: {
         background: "#fff",
         color: Palette.primary,
+        padding: "10px 18px",
         border: `1px solid ${Palette.primary}`,
         boxShadow: `0 4px 8px ${Palette.secondaryShadow}`,
+    },
+
+    tertiary: {
+        background: "#fff",
+        color: Palette.primary,
+        border: 0,
+        padding: 2
     },
 
     hoverPrimary: {
